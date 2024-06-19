@@ -4,35 +4,51 @@ ARG NODE_VERSION=21.7.1
 
 FROM node:${NODE_VERSION}-alpine as builder
 
+
 WORKDIR /home/node/app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci
+
 
 COPY . .
+
+
 RUN npm run build
 
+
 FROM node:${NODE_VERSION}-alpine as runner
+
+USER node
+
+RUN mkdir -p /home/node/app
 
 WORKDIR /home/node/app
 
 ENV NODE_ENV=production
 
-COPY --from=builder /home/node/app ./
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev --ignore-scripts
 
-# Ensure correct ownership
-RUN chown -R node:node /home/node/app
 
-USER node
+COPY --from=builder --chown=node:node /home/node/app/dist ./
 
-# Create node_modules directory if it doesn't exist
-RUN mkdir -p /home/node/app/node_modules
+EXPOSE 5501
 
-# Ensure correct permissions for node_modules
-RUN chown -R node:node /home/node/app/node_modules
 
-RUN npm ci --omit=dev
 
-EXPOSE 5504
+CMD ["node", "src/server.js"]
 
-CMD ["node", "server.js"]
+
+
+
+
+
+
+
+
