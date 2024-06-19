@@ -6,7 +6,18 @@ export class KafkaBroker implements MessageBroker {
   private consumer: Consumer;
 
   constructor(clientId: string, brokers: string[]) {
-    const kafka = new Kafka({ clientId, brokers });
+    const kafka = new Kafka({
+      clientId,
+      brokers,
+      ssl: true,
+      connectionTimeout: 45000,
+      sasl: {
+        mechanism: "plain",
+        username: "BEFPZRH2LIVXDTOF",
+        password:
+          "2wk4w/W4Ir94fn6x1T/NLSofHAqu4klmDLZ0PgIRcn4FUVQ86o6jzXzNsdr3ZC1B",
+      },
+    });
 
     this.consumer = kafka.consumer({ groupId: clientId });
   }
