@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 const wsServer = createServer();
 
 // todo: move origin value to the config.
-const io = new Server(wsServer, { cors: { origin: "http://localhost:5173" } });
+const io = new Server(wsServer, { cors: { origin: "https://elib.lol" } });
 
 io.on("connection", (socket) => {
   console.log("Client connected", socket.id);
