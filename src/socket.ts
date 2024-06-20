@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 const wsServer = createServer();
 
 // todo: move origin value to the config.
-const io = new Server(wsServer, {cors: {origin: "http://elib.lol", methods: ["POST", "GET"], credentials: true}});
+const io = new Server(wsServer, {cors: {origin: "*", methods: ["POST", "GET"], credentials: true}});
 
 io.on("connection", (socket) => {
   console.log("Client connected", socket.id);
